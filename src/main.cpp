@@ -1,81 +1,75 @@
+#include "./lib/util.h"
+#include "./lib/conio.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
 #include <iomanip>
 #include <string>
-#include "./lib/util.h"
 #define rep(i, n) for (int i = 0; i < (n); i++)
 
 using namespace std;
 
-const w_size min_w = 74;
-const w_size left_side_w = 40;
-const w_size game_w = 20;
-const w_size game_h = 20;
-const w_size wall_w = 2;
-const w_size wall_h = 1;
-const w_size right_side_w = 40;
-const w_size gap_w = 5;
-const w_size min_h = game_h + wall_h * 2;
-short int game[game_h][game_w / 2] = {
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {0, 0, 1, 1, 1, 1, 0, 1, 1, 1}};
-string block = "\u2588\u2588";
-string wall = "[]";
-string block_fade[] = {
-  "██",
-  "█▊",
-  "█▋",
-  "█▍",
-  "█▏",
-  "█",
-  "▊",
-  "▋",
-  "▍",
-  "▏",
-  "  "
-};
-string air = " .";
-
 int main()
 {
+  bool game[game_h][game_w / 2] = {};
+  // bool game[game_h][game_w / 2] = {
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+  //     {0, 1, 0, 0, 0, 1, 0, 0, 0, 0},
+  //     {0, 1, 1, 0, 0, 1, 0, 0, 0, 0},
+  //     {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  //     {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  //     {0, 0, 1, 1, 1, 1, 0, 1, 1, 1},
+  // };
+
+  // 入力の設定
+  struct termios save_settings;
+  struct termios settings;
+  char c;
+
+  tcgetattr(0, &save_settings);
+  settings = save_settings;
+
+  settings.c_lflag &= ~(ECHO | ICANON); /* 入力をエコーバックしない、バッファリングしない */
+  settings.c_cc[VTIME] = 0;
+  settings.c_cc[VMIN] = 1;
+  tcsetattr(0, TCSANOW, &settings);
+  fcntl(0, F_SETFL, O_NONBLOCK); /* 標準入力からの読み込むときブロックしないようにする */
+
   w_size col, row;
   get_ws(col, row);
-  cout << col << endl;
+  cout << "window size: " << col << "x" << row << endl;
+
+  Sleep(1s);
   if (col < min_w)
   {
-    throw runtime_error("windows col smaller than 64");
+    throw runtime_error("window col smaller than 64");
   }
-  for (int h = 0; h < min_h; ++h)
+
+  Block blk(game);
+
+  int i = 0;
+  while (true)
   {
-    rep(i, left_side_w) { cout << " "; }
-    if (h == 0 || h == min_h - 1)
-      rep(i, game_w / 2 + wall_w) { cout << wall; }
-    else
-    {
-      cout << wall;
-      rep(i, game_w / 2) { cout << (game[h - 1][i] ? block : air); }
-      cout << wall;
-    }
-    cout << "\n";
+    // cout << getchar() << endl;
+    display(game);
+    cout << i << endl;
+    Sleep(100ms);
+    ++i;
   }
-  cout << flush;
+  tcsetattr(0, TCSANOW, &save_settings);
+  cout << "ended" << endl;
 }
