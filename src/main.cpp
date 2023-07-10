@@ -44,10 +44,10 @@ int main()
   settings = save_settings;
 
   settings.c_lflag &= ~(ECHO | ICANON); /* 入力をエコーバックしない、バッファリングしない */
-  settings.c_cc[VTIME] = 0;
+  settings.c_cc[VTIME] = 1;
   settings.c_cc[VMIN] = 1;
   tcsetattr(0, TCSANOW, &settings);
-  fcntl(0, F_SETFL, O_NONBLOCK); /* 標準入力からの読み込むときブロックしないようにする */
+  // fcntl(0, F_SETFL, O_NONBLOCK); /* 標準入力からの読み込むときブロックしないようにする */
 
   w_size col, row;
   get_ws(col, row);
@@ -64,12 +64,19 @@ int main()
   int i = 0;
   while (true)
   {
-    // cout << getchar() << endl;
+    // c = getchar();
+    cout << "1" << endl;
     display(game);
+    cout << "2" << endl;
     cout << i << endl;
-    Sleep(100ms);
+    cout << "3" << endl;
+    // cout << c << endl;
+    cout << "4" << endl;
+    Sleep(2ms);
+    cout << "5" << endl;
     ++i;
+    cout << "6" << endl;
   }
-  tcsetattr(0, TCSANOW, &save_settings);
+  // tcsetattr(0, TCSANOW, &save_settings);
   cout << "ended" << endl;
 }

@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
   settings.c_cc[VTIME] = 0;
   settings.c_cc[VMIN] = 1;
   tcsetattr(0, TCSANOW, &settings);
-  fcntl(0, F_SETFL, O_NONBLOCK); /* 標準入力からの読み込むときブロックしないようにする */
+  // fcntl(0, F_SETFL, O_NONBLOCK); /* 標準入力からの読み込むときブロックしないようにする */
 
   while (1)
   {
